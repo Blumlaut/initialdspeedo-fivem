@@ -8,7 +8,6 @@ idcars = {"FUTO", "AE86", "86", "BLISTA2"} -- cars that use the AE86 speed chime
 
 curNeedle, curTachometer, curBackground, labelType, rpmScale, curAlpha, curDriftAlpha, driftSprite = "rpm", "labels_86", "nodrift_background", "8k", 242,0,0, "drift_blue" -- ignore this stuff
 RPM, degree = 0, 0 -- ignore this too
-overwriteChecks = false -- debug value to display all icons
 Citizen.CreateThread(function()
 
 	function math.round(num, numDecimalPlaces)
