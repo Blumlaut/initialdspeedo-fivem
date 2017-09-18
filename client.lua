@@ -6,7 +6,7 @@ inputGroup, ControlIndex = 0, 137 --default toggle for kph/mph is caps lock
 
 idcars = {"FUTO", "AE86", "86", "BLISTA2"} -- cars that use the AE86 speed chime and ae86 RPM background
 
-curNeedle, curTachometer, curBackground, labelType, rpmScale, curAlpha, curDriftAlpha = "rpm", "labels_86", "nodrift_background", "8k", 242,0,0 -- ignore this stuff
+curNeedle, curTachometer, curBackground, labelType, rpmScale, curAlpha, curDriftAlpha, driftSprite = "rpm", "labels_86", "nodrift_background", "8k", 242,0,0, "drift_blue" -- ignore this stuff
 RPM, degree = 0, 0 -- ignore this too
 overwriteChecks = false -- debug value to display all icons
 Citizen.CreateThread(function()
@@ -40,14 +40,16 @@ Citizen.CreateThread(function()
 			goDown = false
 		elseif curDriftAlpha >= 255 then
 			curDriftAlpha = 255
-			goDown = true
+			if driftSprite ~= "drift_yellow" then
+				goDown = true
+			end
 		end
 	end
 	SpeedChimeActive = false
 	while true do
 		Citizen.Wait(0)
 		speedTable = {}
-		local veh = GetVehiclePedIsUsing(GetPlayerPed(-1))
+		local veh = GetVehiclePedIsUsing(PlayerPedId())
 		if IsPedInAnyVehicle(GetPlayerPed(-1),true) and GetSeatPedIsTryingToEnter(GetPlayerPed(-1)) == -1 or GetPedInVehicleSeat(veh, -1) == GetPlayerPed(-1) then
 			if curAlpha >= 255 then
 				curAlpha = 255
@@ -108,7 +110,7 @@ Citizen.CreateThread(function()
 				end
 				
 				for i,theName in ipairs(idcars) do
-					if string.find(GetDisplayNameFromVehicleModel(GetEntityModel(veh)), theName) >= 0 then
+					if string.find(GetDisplayNameFromVehicleModel(GetEntityModel(veh)), theName) ~= nil and string.find(GetDisplayNameFromVehicleModel(GetEntityModel(veh)), theName) >= 0 then
 						labelType = "86"
 						rpmScale = 242
 					end
@@ -121,7 +123,7 @@ Citizen.CreateThread(function()
 						TriggerEvent("LIFE_CL:Sound:StopOnOne")
 					end
 				end
-				end
+				end 
 				if GetEntitySpeed(veh) > 0 then degree=(GetEntitySpeed(veh)*2.036936)*step end
 				if degree > 290 then degree=290 end
 				if GetVehicleClass(veh) >= 0 and GetVehicleClass(veh) < 13 or GetVehicleClass(veh) >= 17 then
@@ -146,14 +148,17 @@ Citizen.CreateThread(function()
 				RPM = 0.067
 			end
 			
-			if angle(veh) >= 10 and angle(veh) <= 30 then
-				DrawSprite("speedometer", "drift_blue", 0.765,0.770,0.05,0.04, 0.0, 255, 255, 255, curDriftAlpha)
+			if angle(veh) >= 10 and angle(veh) <= 18 then
+				driftSprite = "drift_blue"
+				DrawSprite("speedometer", driftSprite, 0.765,0.770,0.05,0.04, 0.0, 255, 255, 255, curDriftAlpha)
 				BlinkDriftText(false)
-			elseif angle(veh) > 30 then
-				DrawSprite("speedometer", "drift_yellow", 0.765,0.770,0.05,0.04, 0.0, 255, 255, 255, curDriftAlpha)
+			elseif angle(veh) > 18 then
+				driftSprite = "drift_yellow"
+				DrawSprite("speedometer", driftSprite, 0.765,0.770,0.05,0.04, 0.0, 255, 255, 255, curDriftAlpha)
 				BlinkDriftText(false)
 			elseif angle(veh) < 10 then
-				DrawSprite("speedometer", "drift_blue", 0.765,0.770,0.05,0.04, 0.0, 255, 255, 255, curDriftAlpha)
+				driftSprite = "drift_blue"
+				DrawSprite("speedometer", driftSprite, 0.765,0.770,0.05,0.04, 0.0, 255, 255, 255, curDriftAlpha)
 				BlinkDriftText(true)
 			end
 			
@@ -194,3 +199,4 @@ Citizen.CreateThread(function()
 		end
 	end	
 end)
+
