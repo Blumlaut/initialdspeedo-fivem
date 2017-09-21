@@ -1,12 +1,20 @@
 # initialdspeedo-fivem
 an initial d speedo for fivem
 
+# what you can do
+Download an use for your server
+
+reskin aslong as you give credit to me
 
 
-**Note: this script is licensed under "[No License](https://choosealicense.com/no-license/)", you are allowed to:**
+# what you CANNOT do
+re-release without any ( major ) changes
 
-**Download, Use and Edit the Script.**
+publish anywhere without my written permission ( that includes but is not limited to creating mirrors, uploading to file-hosting services etc )
 
-**you are not allowed to:**
+claim you made it when you didn't
 
-**Copy, re-release, re-distribute it without my written permission.**
+
+
+Original Initial D Speedo textures' credits go to Vegetable Tsai on 
+racedepartment http://www.racedepartment.com/downloads/initial-d6-hud.16381/
