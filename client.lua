@@ -146,21 +146,23 @@ Citizen.CreateThread(function()
 			if RPM < 0.067 or not RPM then 
 				RPM = 0.067
 			end
-			
-			if angle(veh) >= 10 and angle(veh) <= 18 then
-				driftSprite = "drift_blue"
-				DrawSprite("speedometer", driftSprite, 0.765,0.770,0.05,0.04, 0.0, 255, 255, 255, curDriftAlpha)
-				BlinkDriftText(false)
-			elseif angle(veh) > 18 then
-				driftSprite = "drift_yellow"
-				DrawSprite("speedometer", driftSprite, 0.765,0.770,0.05,0.04, 0.0, 255, 255, 255, curDriftAlpha)
-				BlinkDriftText(false)
-			elseif angle(veh) < 10 then
-				driftSprite = "drift_blue"
-				DrawSprite("speedometer", driftSprite, 0.765,0.770,0.05,0.04, 0.0, 255, 255, 255, curDriftAlpha)
-				BlinkDriftText(true)
+			if GetPedInVehicleSeat(veh, -1) == GetPlayerPed(-1) then
+				if angle(veh) >= 10 and angle(veh) <= 18 then
+					driftSprite = "drift_blue"
+					DrawSprite("speedometer", driftSprite, 0.765,0.770,0.05,0.04, 0.0, 255, 255, 255, curDriftAlpha)
+					BlinkDriftText(false)
+				elseif angle(veh) > 18 then
+					driftSprite = "drift_yellow"
+					DrawSprite("speedometer", driftSprite, 0.765,0.770,0.05,0.04, 0.0, 255, 255, 255, curDriftAlpha)
+					BlinkDriftText(false)
+				elseif angle(veh) < 10 then
+					driftSprite = "drift_blue"
+					DrawSprite("speedometer", driftSprite, 0.765,0.770,0.05,0.04, 0.0, 255, 255, 255, curDriftAlpha)
+					BlinkDriftText(true)
+				end
+			else
+				curDriftAlpha = 0
 			end
-			
 			if not gear then gear = 1 end
 			if gear == 1 then gear = 0 end
 			
