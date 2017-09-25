@@ -146,7 +146,7 @@ Citizen.CreateThread(function()
 			if RPM < 0.067 or not RPM then 
 				RPM = 0.067
 			end
-			if GetPedInVehicleSeat(veh, -1) == GetPlayerPed(-1) then
+			if GetPedInVehicleSeat(veh, -1) == GetPlayerPed(-1) and GetVehicleClass(veh) >= 0 and GetVehicleClass(veh) < 13 or GetVehicleClass(veh) >= 17 then
 				if angle(veh) >= 10 and angle(veh) <= 18 then
 					driftSprite = "drift_blue"
 					DrawSprite("speedometer", driftSprite, 0.765,0.770,0.05,0.04, 0.0, 255, 255, 255, curDriftAlpha)
