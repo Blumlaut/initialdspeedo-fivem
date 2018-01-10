@@ -27,8 +27,8 @@ local skinData = {
 	TachoBGloc = {0.110,0.004,0.125,0.17},
 	TachoNeedleLoc = {0.110,0.030,0.09,0.17},
 
-	FuelBGLoc = {-0.035, -0.030,0.05, 0.04},
-	FuelGaugeLoc = {0.060,0.000,0.040,0.08},
+	FuelBGLoc = {-0.035, -0.030,0.040, 0.040},
+	FuelGaugeLoc = {0.060,0.000,0.030,0.080},
 
 
 	-- you can also add your own values and use them in the code below, the sky is the limit!
