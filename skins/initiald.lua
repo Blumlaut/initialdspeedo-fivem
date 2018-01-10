@@ -30,14 +30,15 @@ local skinData = {
 	FuelBGLoc = {-0.035, -0.030,0.05, 0.04},
 	FuelGaugeLoc = {0.060,0.000,0.040,0.08},
 
-	-- you can also add your own values and use them in the code below, the sky is the limit!
 
+	-- you can also add your own values and use them in the code below, the sky is the limit!
 	GearLoc = {0.010,-0.033,0.025,0.055}, -- gear location
 	Speed1Loc = {-0.024,0.042,0.025,0.06}, -- 3rd digit
 	Speed2Loc = {-0.004,0.042,0.025,0.06}, -- 2nd digit
 	Speed3Loc = {0.020,0.042,0.025,0.06}, -- 1st digit
-
 	UnitLoc = {0.029,0.088,0.025,0.025},
+	TurboBGLoc = {0.053, -0.130, 0.075,0.090},
+	TurboGaugeLoc = {0.0533, -0.125, 0.045,0.060},
 
 	RotMult = 2.036936,
 	RotStep = 2.32833,
@@ -139,8 +140,20 @@ Citizen.CreateThread(function()
 				_,lightson,highbeams = GetVehicleLightsState(veh)
 				if lightson == 1 or highbeams == 1 then
 					curTachometer = "night_labels_"..labelType
+					if useKPH then
+						curTurbo = "turbo"
+					else
+						curTurbo = "turbo_psi"
+					end
+					curTurboNeedle = "needle"
 				else
 					curTachometer = "labels_"..labelType
+					if useKPH then
+						curTurbo = "turbo_day"
+					else
+						curTurbo = "turbo_day_psi"
+					end
+					curTurboNeedle = "needle_day"
 				end
 				curSpeedometer = "nodrift_background"
 
@@ -188,8 +201,16 @@ Citizen.CreateThread(function()
 					DrawSprite(cst.ytdName, "speed_digits_9", cst.centerCoords[1]+cst.Speed2Loc[1],cst.centerCoords[2]+cst.Speed2Loc[2],cst.Speed2Loc[3],cst.Speed2Loc[4], 0.0, 255, 255, 255, curAlpha)
 					DrawSprite(cst.ytdName, "speed_digits_9", cst.centerCoords[1]+cst.Speed1Loc[1],cst.centerCoords[2]+cst.Speed1Loc[2],cst.Speed1Loc[3],cst.Speed1Loc[4], 0.0, 255, 255, 255, curAlpha)
 				end
+				local boost = GetVehicleTurboPressure(veh)
+				if boost > 0.0 then
 
+				else
 
+				end
+				if IsToggleModOn(veh,18) then
+					DrawSprite(cst.ytdName, curTurbo, cst.centerCoords[1]+cst.TurboBGLoc[1],cst.centerCoords[2]+cst.TurboBGLoc[2],cst.TurboBGLoc[3],cst.TurboBGLoc[4], 0.0, 255, 255, 255, curAlpha)
+					DrawSprite(cst.ytdName, curTurboNeedle, cst.centerCoords[1]+cst.TurboGaugeLoc[1],cst.centerCoords[2]+cst.TurboGaugeLoc[2],cst.TurboGaugeLoc[3],cst.TurboGaugeLoc[4], (GetVehicleTurboPressure(veh)*100)-625, 255, 255, 255, curAlpha)
+				end
 				if GetPedInVehicleSeat(veh, -1) == GetPlayerPed(-1) and GetVehicleClass(veh) >= 0 and GetVehicleClass(veh) < 13 or GetVehicleClass(veh) >= 17 then
 					if angle(veh) >= 10 and angle(veh) <= 18 then
 						driftSprite = "drift_blue"
@@ -207,6 +228,8 @@ Citizen.CreateThread(function()
 				else
 					curDriftAlpha = 0
 				end
+
+
 			end
 		end
 	end
