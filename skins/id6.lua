@@ -1,7 +1,7 @@
 local skinData = {
 	-- names
-	skinName = "initiald",
-	ytdName = "initiald",
+	skinName = "id6",
+	ytdName = "id6",
 	-- texture dictionary informations:
 	-- night textures are supposed to look like this:
 	-- "needle", "tachometer", cst.ytdName, "fuelgauge"
@@ -51,12 +51,12 @@ local skinData = {
 addSkin(skinData)
 
 
-
 -- addon code
 
 local idcars = {"FUTO", "AE86", "86", "BLISTA2"} -- cars that use the AE86 speed chime and ae86 RPM background
 local labelType = "8k"
 local curDriftAlpha = 0
+local curAlpha = 0
 local useKPH = GetResourceKvpString("initiald_unit") -- handle our unit saving
 if not useKPH then
 	SetResourceKvp("initiald_unit", "true")
@@ -82,7 +82,7 @@ function angle(veh)
 	local cosX = (sn*vx + cs*vy)/modV
 	return math.deg(math.acos(cosX))*0.5, modV
 end
-function BlinkDriftText(hide)
+local function BlinkDriftText(hide)
 	if hide == true or goDown == true then
 		curDriftAlpha = curDriftAlpha-15
 	elseif not hide or goDown == false then
@@ -104,27 +104,44 @@ SpeedChimeActive = false
 Citizen.CreateThread(function()
 	while true do
 		Citizen.Wait(0)
-		if getCurrentSkin() == "initiald" then
+		if getCurrentSkin() == skinData.skinName then
+			if overwriteAlpha then curAlpha = 0 end
+			if not overwriteAlpha then
+				if IsPedInAnyVehicle(GetPlayerPed(-1),true) and GetSeatPedIsTryingToEnter(GetPlayerPed(-1)) == -1 or GetPedInVehicleSeat(veh, -1) == GetPlayerPed(-1) then
+						if curAlpha >= 255 then
+							curAlpha = 255
+						else
+							curAlpha = curAlpha+5
+						end
+				elseif not IsPedInAnyVehicle(GetPlayerPed(-1),false) then
+						if curAlpha <= 0 then
+							curAlpha = 0
+						else
+							curAlpha = curAlpha-5
+						end
+					end
+			end
 			speedTable = {}
 			showFuelGauge = false
+			veh = GetVehiclePedIsUsing(GetPlayerPed(-1))
 			if DoesEntityExist(veh) and not IsEntityDead(veh) then
 				if GetVehicleClass(veh) >= 0 and GetVehicleClass(veh) <= 5 then
 					labelType = "8k"
-					cst.rpmScale = 200
+					skinData.rpmScale = 200
 				elseif GetVehicleClass(veh) == 6 then
 					labelType = "9k"
-					cst.rpmScale = 222
+					skinData.rpmScale = 222
 				elseif GetVehicleClass(veh) == 7 then
 					labelType = "10k"
-					cst.rpmScale = 222
+					skinData.rpmScale = 222
 				elseif GetVehicleClass(veh) == 8 then
 					labelType = "13k"
-					cst.rpmScale = 220
+					skinData.rpmScale = 220
 				end
 				for i,theName in ipairs(idcars) do
 					if string.find(GetDisplayNameFromVehicleModel(GetEntityModel(veh)), theName) ~= nil and string.find(GetDisplayNameFromVehicleModel(GetEntityModel(veh)), theName) >= 0 then
 						labelType = "86"
-						cst.rpmScale = 242
+						skinData.rpmScale = 242
 					end
 					if GetDisplayNameFromVehicleModel(GetEntityModel(veh)) == theName then
 						if not SpeedChimeActive and GetEntitySpeed(veh)*3.6 > 105.0 then
@@ -163,9 +180,9 @@ Citizen.CreateThread(function()
 				if gear == 1 then gear = 0 end
 
 
-				DrawSprite(cst.ytdName, curSpeedometer, cst.centerCoords[1]+cst.SpeedoBGLoc[1],cst.centerCoords[2]+cst.SpeedoBGLoc[2],cst.SpeedoBGLoc[3],cst.SpeedoBGLoc[4], 0.0, 255, 255, 255, curAlpha)
-				DrawSprite(cst.ytdName, curTachometer, cst.centerCoords[1]+cst.TachoBGloc[1],cst.centerCoords[2]+cst.TachoBGloc[2],cst.TachoBGloc[3],cst.TachoBGloc[4], 0.0, 255, 255, 255, curAlpha)
-				DrawSprite(cst.ytdName, "gear_"..gear, cst.centerCoords[1]+cst.GearLoc[1],cst.centerCoords[2]+cst.GearLoc[2],cst.GearLoc[3],cst.GearLoc[4], 0.0, 255, 255, 255, curAlpha)
+				DrawSprite(skinData.ytdName, curSpeedometer, skinData.centerCoords[1]+skinData.SpeedoBGLoc[1],skinData.centerCoords[2]+skinData.SpeedoBGLoc[2],skinData.SpeedoBGLoc[3],skinData.SpeedoBGLoc[4], 0.0, 255, 255, 255, curAlpha)
+				DrawSprite(skinData.ytdName, curTachometer, skinData.centerCoords[1]+skinData.TachoBGloc[1],skinData.centerCoords[2]+skinData.TachoBGloc[2],skinData.TachoBGloc[3],skinData.TachoBGloc[4], 0.0, 255, 255, 255, curAlpha)
+				DrawSprite(skinData.ytdName, "gear_"..gear, skinData.centerCoords[1]+skinData.GearLoc[1],skinData.centerCoords[2]+skinData.GearLoc[2],skinData.GearLoc[3],skinData.GearLoc[4], 0.0, 255, 255, 255, curAlpha)
 
 				local speed = GetEntitySpeed(veh)
 
@@ -176,9 +193,9 @@ Citizen.CreateThread(function()
 				end
 
 				if useKPH then
-					DrawSprite(cst.ytdName, "kmh", cst.centerCoords[1]+cst.UnitLoc[1],cst.centerCoords[2]+cst.UnitLoc[2],cst.UnitLoc[3],cst.UnitLoc[4], 0.0, 255, 255, 255, curAlpha)
+					DrawSprite(skinData.ytdName, "kmh", skinData.centerCoords[1]+skinData.UnitLoc[1],skinData.centerCoords[2]+skinData.UnitLoc[2],skinData.UnitLoc[3],skinData.UnitLoc[4], 0.0, 255, 255, 255, curAlpha)
 				else
-					DrawSprite(cst.ytdName, "mph", cst.centerCoords[1]+cst.UnitLoc[1],cst.centerCoords[2]+cst.UnitLoc[2],cst.UnitLoc[3],cst.UnitLoc[4], 0.0, 255, 255, 255, curAlpha)
+					DrawSprite(skinData.ytdName, "mph", skinData.centerCoords[1]+skinData.UnitLoc[1],skinData.centerCoords[2]+skinData.UnitLoc[2],skinData.UnitLoc[3],skinData.UnitLoc[4], 0.0, 255, 255, 255, curAlpha)
 				end
 
 				if not speed then speed = "0.0" end
@@ -188,18 +205,18 @@ Citizen.CreateThread(function()
 					speedTable[i] = speed:sub(i, i)
 				end
 				if string.len(speed) == 1 then
-					DrawSprite(cst.ytdName, "speed_digits_"..speedTable[1], cst.centerCoords[1]+cst.Speed3Loc[1],cst.centerCoords[2]+cst.Speed3Loc[2],cst.Speed3Loc[3],cst.Speed3Loc[4], 0.0, 255, 255, 255, curAlpha)
+					DrawSprite(skinData.ytdName, "speed_digits_"..speedTable[1], skinData.centerCoords[1]+skinData.Speed3Loc[1],skinData.centerCoords[2]+skinData.Speed3Loc[2],skinData.Speed3Loc[3],skinData.Speed3Loc[4], 0.0, 255, 255, 255, curAlpha)
 				elseif string.len(speed) == 2 then
-					DrawSprite(cst.ytdName, "speed_digits_"..speedTable[1], cst.centerCoords[1]+cst.Speed2Loc[1],cst.centerCoords[2]+cst.Speed2Loc[2],cst.Speed2Loc[3],cst.Speed2Loc[4], 0.0, 255, 255, 255, curAlpha)
-					DrawSprite(cst.ytdName, "speed_digits_"..speedTable[2], cst.centerCoords[1]+cst.Speed3Loc[1],cst.centerCoords[2]+cst.Speed3Loc[2],cst.Speed3Loc[3],cst.Speed3Loc[4], 0.0, 255, 255, 255, curAlpha)
+					DrawSprite(skinData.ytdName, "speed_digits_"..speedTable[1], skinData.centerCoords[1]+skinData.Speed2Loc[1],skinData.centerCoords[2]+skinData.Speed2Loc[2],skinData.Speed2Loc[3],skinData.Speed2Loc[4], 0.0, 255, 255, 255, curAlpha)
+					DrawSprite(skinData.ytdName, "speed_digits_"..speedTable[2], skinData.centerCoords[1]+skinData.Speed3Loc[1],skinData.centerCoords[2]+skinData.Speed3Loc[2],skinData.Speed3Loc[3],skinData.Speed3Loc[4], 0.0, 255, 255, 255, curAlpha)
 				elseif string.len(speed) == 3 then
-					DrawSprite(cst.ytdName, "speed_digits_"..speedTable[1], cst.centerCoords[1]+cst.Speed1Loc[1],cst.centerCoords[2]+cst.Speed1Loc[2],cst.Speed1Loc[3],cst.Speed1Loc[4], 0.0, 255, 255, 255, curAlpha)
-					DrawSprite(cst.ytdName, "speed_digits_"..speedTable[2], cst.centerCoords[1]+cst.Speed2Loc[1],cst.centerCoords[2]+cst.Speed2Loc[2],cst.Speed2Loc[3],cst.Speed2Loc[4], 0.0, 255, 255, 255, curAlpha)
-					DrawSprite(cst.ytdName, "speed_digits_"..speedTable[3], cst.centerCoords[1]+cst.Speed3Loc[1],cst.centerCoords[2]+cst.Speed3Loc[2],cst.Speed3Loc[3],cst.Speed3Loc[4], 0.0, 255, 255, 255, curAlpha)
+					DrawSprite(skinData.ytdName, "speed_digits_"..speedTable[1], skinData.centerCoords[1]+skinData.Speed1Loc[1],skinData.centerCoords[2]+skinData.Speed1Loc[2],skinData.Speed1Loc[3],skinData.Speed1Loc[4], 0.0, 255, 255, 255, curAlpha)
+					DrawSprite(skinData.ytdName, "speed_digits_"..speedTable[2], skinData.centerCoords[1]+skinData.Speed2Loc[1],skinData.centerCoords[2]+skinData.Speed2Loc[2],skinData.Speed2Loc[3],skinData.Speed2Loc[4], 0.0, 255, 255, 255, curAlpha)
+					DrawSprite(skinData.ytdName, "speed_digits_"..speedTable[3], skinData.centerCoords[1]+skinData.Speed3Loc[1],skinData.centerCoords[2]+skinData.Speed3Loc[2],skinData.Speed3Loc[3],skinData.Speed3Loc[4], 0.0, 255, 255, 255, curAlpha)
 				elseif string.len(speed) >= 4 then
-					DrawSprite(cst.ytdName, "speed_digits_9", cst.centerCoords[1]+cst.Speed3Loc[1],cst.centerCoords[2]+cst.Speed3Loc[2],cst.Speed3Loc[3],cst.Speed3Loc[4], 0.0, 255, 255, 255, curAlpha)
-					DrawSprite(cst.ytdName, "speed_digits_9", cst.centerCoords[1]+cst.Speed2Loc[1],cst.centerCoords[2]+cst.Speed2Loc[2],cst.Speed2Loc[3],cst.Speed2Loc[4], 0.0, 255, 255, 255, curAlpha)
-					DrawSprite(cst.ytdName, "speed_digits_9", cst.centerCoords[1]+cst.Speed1Loc[1],cst.centerCoords[2]+cst.Speed1Loc[2],cst.Speed1Loc[3],cst.Speed1Loc[4], 0.0, 255, 255, 255, curAlpha)
+					DrawSprite(skinData.ytdName, "speed_digits_9", skinData.centerCoords[1]+skinData.Speed3Loc[1],skinData.centerCoords[2]+skinData.Speed3Loc[2],skinData.Speed3Loc[3],skinData.Speed3Loc[4], 0.0, 255, 255, 255, curAlpha)
+					DrawSprite(skinData.ytdName, "speed_digits_9", skinData.centerCoords[1]+skinData.Speed2Loc[1],skinData.centerCoords[2]+skinData.Speed2Loc[2],skinData.Speed2Loc[3],skinData.Speed2Loc[4], 0.0, 255, 255, 255, curAlpha)
+					DrawSprite(skinData.ytdName, "speed_digits_9", skinData.centerCoords[1]+skinData.Speed1Loc[1],skinData.centerCoords[2]+skinData.Speed1Loc[2],skinData.Speed1Loc[3],skinData.Speed1Loc[4], 0.0, 255, 255, 255, curAlpha)
 				end
 				local boost = GetVehicleTurboPressure(veh)
 				if boost > 0.0 then
@@ -208,21 +225,21 @@ Citizen.CreateThread(function()
 
 				end
 				if IsToggleModOn(veh,18) then
-					DrawSprite(cst.ytdName, curTurbo, cst.centerCoords[1]+cst.TurboBGLoc[1],cst.centerCoords[2]+cst.TurboBGLoc[2],cst.TurboBGLoc[3],cst.TurboBGLoc[4], 0.0, 255, 255, 255, curAlpha)
-					DrawSprite(cst.ytdName, curTurboNeedle, cst.centerCoords[1]+cst.TurboGaugeLoc[1],cst.centerCoords[2]+cst.TurboGaugeLoc[2],cst.TurboGaugeLoc[3],cst.TurboGaugeLoc[4], (GetVehicleTurboPressure(veh)*100)-625, 255, 255, 255, curAlpha)
+					DrawSprite(skinData.ytdName, curTurbo, skinData.centerCoords[1]+skinData.TurboBGLoc[1],skinData.centerCoords[2]+skinData.TurboBGLoc[2],skinData.TurboBGLoc[3],skinData.TurboBGLoc[4], 0.0, 255, 255, 255, curAlpha)
+					DrawSprite(skinData.ytdName, curTurboNeedle, skinData.centerCoords[1]+skinData.TurboGaugeLoc[1],skinData.centerCoords[2]+skinData.TurboGaugeLoc[2],skinData.TurboGaugeLoc[3],skinData.TurboGaugeLoc[4], (GetVehicleTurboPressure(veh)*100)-625, 255, 255, 255, curAlpha)
 				end
 				if GetPedInVehicleSeat(veh, -1) == GetPlayerPed(-1) and GetVehicleClass(veh) >= 0 and GetVehicleClass(veh) < 13 or GetVehicleClass(veh) >= 17 then
 					if angle(veh) >= 10 and angle(veh) <= 18 then
 						driftSprite = "drift_blue"
-						DrawSprite(cst.ytdName, driftSprite, cst.centerCoords[1]+cst.FuelBGLoc[1],cst.centerCoords[2]+cst.FuelBGLoc[2],cst.FuelBGLoc[3],cst.FuelBGLoc[4], 0.0, 255, 255, 255, curDriftAlpha)
+						DrawSprite(skinData.ytdName, driftSprite, skinData.centerCoords[1]+skinData.FuelBGLoc[1],skinData.centerCoords[2]+skinData.FuelBGLoc[2],skinData.FuelBGLoc[3],skinData.FuelBGLoc[4], 0.0, 255, 255, 255, curDriftAlpha)
 						BlinkDriftText(false)
 					elseif angle(veh) > 18 then
 						driftSprite = "drift_yellow"
-						DrawSprite(cst.ytdName, driftSprite, cst.centerCoords[1]+cst.FuelBGLoc[1],cst.centerCoords[2]+cst.FuelBGLoc[2],cst.FuelBGLoc[3],cst.FuelBGLoc[4], 0.0, 255, 255, 255, curDriftAlpha)
+						DrawSprite(skinData.ytdName, driftSprite, skinData.centerCoords[1]+skinData.FuelBGLoc[1],skinData.centerCoords[2]+skinData.FuelBGLoc[2],skinData.FuelBGLoc[3],skinData.FuelBGLoc[4], 0.0, 255, 255, 255, curDriftAlpha)
 						BlinkDriftText(false)
 					elseif angle(veh) < 10 then
 						driftSprite = "drift_blue"
-						DrawSprite(cst.ytdName, driftSprite, cst.centerCoords[1]+cst.FuelBGLoc[1],cst.centerCoords[2]+cst.FuelBGLoc[2],cst.FuelBGLoc[3],cst.FuelBGLoc[4], 0.0, 255, 255, 255, curDriftAlpha)
+						DrawSprite(skinData.ytdName, driftSprite, skinData.centerCoords[1]+skinData.FuelBGLoc[1],skinData.centerCoords[2]+skinData.FuelBGLoc[2],skinData.FuelBGLoc[3],skinData.FuelBGLoc[4], 0.0, 255, 255, 255, curDriftAlpha)
 						BlinkDriftText(true)
 					end
 				else
@@ -244,7 +261,6 @@ Citizen.CreateThread(function()
 		useKPH = not useKPH
 		SetResourceKvp("initiald_unit", tostring(useKPH))
 	end, false)
-	TriggerEvent('chat:addSuggestion', '/speedounit', 'toggle speedometer unit' )
 
 
 	RegisterNetEvent('initiald:Sound:PlayOnOne')
