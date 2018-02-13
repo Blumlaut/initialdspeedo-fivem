@@ -4,7 +4,7 @@ local skinData = {
 	ytdName = "id7",
 	-- texture dictionary informations:
 	-- night textures are supposed to look like this:
-	-- "needle", "tachometer", cstytdName, "fuelgauge"
+	-- "needle", "tachometer", cst.ytdName, "fuelgauge"
 	-- daytime textures this:
 	-- "needle_day", "tachometer_day", "speedometer_day", "fuelgauge_day"
 	-- these names are hardcoded
@@ -21,34 +21,35 @@ local skinData = {
 	engineLoc = {0.130,0.12,0.020,0.025},
 
 	-- gauge locations
-	SpeedoBGLoc = {0.115, 0.012, 0.18,0.28},
+	SpeedoBGLoc = {0.115, 0.012, 0.17,0.28},
 	SpeedoNeedleLoc = {0.000,5,0.076,0.15},
 
-	TachoBGloc = {0.108,0.009,0.140,0.235},
-	TachoNeedleLoc = {0.108,0.009,0.09,0.17},
+	TachoBGloc = {0.108,0.009,0.135,0.235},
+	TachoNeedleLoc = {0.108,0.009,0.135,0.215},
 
-	FuelBGLoc = {-0.035, -0.030,0.050, 0.040},
+	FuelBGLoc = {0.085, 0.020,0.030, 0.020},
 	FuelGaugeLoc = {0.060,0.000,0.030,0.080},
 
 
 	-- you can also add your own values and use them in the code below, the sky is the limit!
-	GearLoc = {0.010,-0.033,0.025,0.055}, -- gear location
-	Speed1Loc = {-0.024,0.042,0.025,0.06}, -- 3rd digit
-	Speed2Loc = {-0.004,0.042,0.025,0.06}, -- 2nd digit
-	Speed3Loc = {0.020,0.042,0.025,0.06}, -- 1st digit
-	UnitLoc = {0.029,0.088,0.025,0.025},
+	GearLoc = {0.115,0.043,0.025,0.055}, -- gear location
+	Speed1Loc = {0.090,-0.020,0.022,0.05}, -- 3rd digit
+	Speed2Loc = {0.106,-0.020,0.022,0.05}, -- 2nd digit
+	Speed3Loc = {0.126,-0.020,0.022,0.05}, -- 1st digit
+	UnitLoc = {0.145,-0.000,0.020,0.020},
+	RevLight = {0.1054,-0.005,0.138,0.230},
 
 	RotMult = 2.036936,
 	RotStep = 2.32833,
 
+
 	-- rpm scale, defines how "far" the rpm gauge goes before hitting redline
 	rpmScale = 250,
+	rpmScaleDecrease = 60,
 
 }
 
-Citizen.CreateThread(function()
-	exports.sexyspeedometer:addSkin(skinData)
-end)
+addSkin(skinData)
 
 
 -- addon code
@@ -103,28 +104,28 @@ SpeedChimeActive = false
 Citizen.CreateThread(function()
 	while true do
 		Citizen.Wait(0)
-		if exports.sexyspeedometer:getCurrentSkin() == cstskinName then
+		if getCurrentSkin() == cst.skinName then
 			speedTable = {}
-			exports.sexyspeedometer:toggleFuelGauge(false)
+			toggleFuelGauge(false)
 			veh = GetVehiclePedIsUsing(GetPlayerPed(-1))
 			if DoesEntityExist(veh) and not IsEntityDead(veh) then
 				if GetVehicleClass(veh) >= 0 and GetVehicleClass(veh) <= 5 then
 					labelType = "8k"
-					cstrpmScale = 200
+					cst.rpmScale = 235
 				elseif GetVehicleClass(veh) == 6 then
 					labelType = "9k"
-					cstrpmScale = 222
+					cst.rpmScale = 235
 				elseif GetVehicleClass(veh) == 7 then
 					labelType = "10k"
-					cstrpmScale = 222
+					cst.rpmScale = 235
 				elseif GetVehicleClass(veh) == 8 then
 					labelType = "13k"
-					cstrpmScale = 220
+					cst.rpmScale = 235
 				end
 				for i,theName in ipairs(idcars) do
 					if string.find(GetDisplayNameFromVehicleModel(GetEntityModel(veh)), theName) ~= nil and string.find(GetDisplayNameFromVehicleModel(GetEntityModel(veh)), theName) >= 0 then
 						labelType = "86"
-						cstrpmScale = 242
+						cst.rpmScale = 242
 					end
 					if GetDisplayNameFromVehicleModel(GetEntityModel(veh)) == theName then
 						if not SpeedChimeActive and GetEntitySpeed(veh)*3.6 > 105.0 then
@@ -150,10 +151,12 @@ Citizen.CreateThread(function()
 				if not gear then gear = 1 end
 				if gear == 1 then gear = 0 end
 
-
-				DrawSprite(cstytdName, curSpeedometer, cstcenterCoords[1]+cstSpeedoBGLoc[1],cstcenterCoords[2]+cstSpeedoBGLoc[2],cstSpeedoBGLoc[3],cstSpeedoBGLoc[4], 0.0, 255, 255, 255, curAlpha)
-				DrawSprite(cstytdName, curTachometer, cstcenterCoords[1]+cstTachoBGloc[1],cstcenterCoords[2]+cstTachoBGloc[2],cstTachoBGloc[3],cstTachoBGloc[4], 0.0, 255, 255, 255, curAlpha)
-				DrawSprite(cstytdName, "gear_"..gear, cstcenterCoords[1]+cstGearLoc[1],cstcenterCoords[2]+cstGearLoc[2],cstGearLoc[3],cstGearLoc[4], 0.0, 255, 255, 255, curAlpha)
+				if RPM > 0.90 then
+					DrawSprite(cst.ytdName, "rev_light", cst.centerCoords[1]+cst.RevLight[1],cst.centerCoords[2]+cst.RevLight[2],cst.RevLight[3],cst.RevLight[4], 0.0, 255, 255, 255, curAlpha)
+				end
+				DrawSprite(cst.ytdName, curSpeedometer, cst.centerCoords[1]+cst.SpeedoBGLoc[1],cst.centerCoords[2]+cst.SpeedoBGLoc[2],cst.SpeedoBGLoc[3],cst.SpeedoBGLoc[4], 0.0, 255, 255, 255, curAlpha)
+				DrawSprite(cst.ytdName, curTachometer, cst.centerCoords[1]+cst.TachoBGloc[1],cst.centerCoords[2]+cst.TachoBGloc[2],cst.TachoBGloc[3],cst.TachoBGloc[4], 0.0, 255, 255, 255, curAlpha)
+				DrawSprite(cst.ytdName, "gear_"..gear, cst.centerCoords[1]+cst.GearLoc[1],cst.centerCoords[2]+cst.GearLoc[2],cst.GearLoc[3],cst.GearLoc[4], 0.0, 255, 255, 255, curAlpha)
 				local speed = GetEntitySpeed(veh)
 
 				if useKPH then
@@ -163,9 +166,9 @@ Citizen.CreateThread(function()
 				end
 
 				if useKPH then
-					DrawSprite(cstytdName, "kmh", cstcenterCoords[1]+cstUnitLoc[1],cstcenterCoords[2]+cstUnitLoc[2],cstUnitLoc[3],cstUnitLoc[4], 0.0, 255, 255, 255, curAlpha)
+					DrawSprite(cst.ytdName, "kmh", cst.centerCoords[1]+cst.UnitLoc[1],cst.centerCoords[2]+cst.UnitLoc[2],cst.UnitLoc[3],cst.UnitLoc[4], 0.0, 255, 255, 255, curAlpha)
 				else
-					DrawSprite(cstytdName, "mph", cstcenterCoords[1]+cstUnitLoc[1],cstcenterCoords[2]+cstUnitLoc[2],cstUnitLoc[3],cstUnitLoc[4], 0.0, 255, 255, 255, curAlpha)
+					DrawSprite(cst.ytdName, "mph", cst.centerCoords[1]+cst.UnitLoc[1],cst.centerCoords[2]+cst.UnitLoc[2],cst.UnitLoc[3],cst.UnitLoc[4], 0.0, 255, 255, 255, curAlpha)
 				end
 
 				if not speed then speed = "0.0" end
@@ -175,31 +178,31 @@ Citizen.CreateThread(function()
 					speedTable[i] = speed:sub(i, i)
 				end
 				if string.len(speed) == 1 then
-					DrawSprite(cstytdName, "speed_digits_"..speedTable[1], cstcenterCoords[1]+cstSpeed3Loc[1],cstcenterCoords[2]+cstSpeed3Loc[2],cstSpeed3Loc[3],cstSpeed3Loc[4], 0.0, 255, 255, 255, curAlpha)
+					DrawSprite(cst.ytdName, "speed_digits_"..speedTable[1], cst.centerCoords[1]+cst.Speed3Loc[1],cst.centerCoords[2]+cst.Speed3Loc[2],cst.Speed3Loc[3],cst.Speed3Loc[4], 0.0, 255, 255, 255, curAlpha)
 				elseif string.len(speed) == 2 then
-					DrawSprite(cstytdName, "speed_digits_"..speedTable[1], cstcenterCoords[1]+cstSpeed2Loc[1],cstcenterCoords[2]+cstSpeed2Loc[2],cstSpeed2Loc[3],cstSpeed2Loc[4], 0.0, 255, 255, 255, curAlpha)
-					DrawSprite(cstytdName, "speed_digits_"..speedTable[2], cstcenterCoords[1]+cstSpeed3Loc[1],cstcenterCoords[2]+cstSpeed3Loc[2],cstSpeed3Loc[3],cstSpeed3Loc[4], 0.0, 255, 255, 255, curAlpha)
+					DrawSprite(cst.ytdName, "speed_digits_"..speedTable[1], cst.centerCoords[1]+cst.Speed2Loc[1],cst.centerCoords[2]+cst.Speed2Loc[2],cst.Speed2Loc[3],cst.Speed2Loc[4], 0.0, 255, 255, 255, curAlpha)
+					DrawSprite(cst.ytdName, "speed_digits_"..speedTable[2], cst.centerCoords[1]+cst.Speed3Loc[1],cst.centerCoords[2]+cst.Speed3Loc[2],cst.Speed3Loc[3],cst.Speed3Loc[4], 0.0, 255, 255, 255, curAlpha)
 				elseif string.len(speed) == 3 then
-					DrawSprite(cstytdName, "speed_digits_"..speedTable[1], cstcenterCoords[1]+cstSpeed1Loc[1],cstcenterCoords[2]+cstSpeed1Loc[2],cstSpeed1Loc[3],cstSpeed1Loc[4], 0.0, 255, 255, 255, curAlpha)
-					DrawSprite(cstytdName, "speed_digits_"..speedTable[2], cstcenterCoords[1]+cstSpeed2Loc[1],cstcenterCoords[2]+cstSpeed2Loc[2],cstSpeed2Loc[3],cstSpeed2Loc[4], 0.0, 255, 255, 255, curAlpha)
-					DrawSprite(cstytdName, "speed_digits_"..speedTable[3], cstcenterCoords[1]+cstSpeed3Loc[1],cstcenterCoords[2]+cstSpeed3Loc[2],cstSpeed3Loc[3],cstSpeed3Loc[4], 0.0, 255, 255, 255, curAlpha)
+					DrawSprite(cst.ytdName, "speed_digits_"..speedTable[1], cst.centerCoords[1]+cst.Speed1Loc[1],cst.centerCoords[2]+cst.Speed1Loc[2],cst.Speed1Loc[3],cst.Speed1Loc[4], 0.0, 255, 255, 255, curAlpha)
+					DrawSprite(cst.ytdName, "speed_digits_"..speedTable[2], cst.centerCoords[1]+cst.Speed2Loc[1],cst.centerCoords[2]+cst.Speed2Loc[2],cst.Speed2Loc[3],cst.Speed2Loc[4], 0.0, 255, 255, 255, curAlpha)
+					DrawSprite(cst.ytdName, "speed_digits_"..speedTable[3], cst.centerCoords[1]+cst.Speed3Loc[1],cst.centerCoords[2]+cst.Speed3Loc[2],cst.Speed3Loc[3],cst.Speed3Loc[4], 0.0, 255, 255, 255, curAlpha)
 				elseif string.len(speed) >= 4 then
-					DrawSprite(cstytdName, "speed_digits_9", cstcenterCoords[1]+cstSpeed3Loc[1],cstcenterCoords[2]+cstSpeed3Loc[2],cstSpeed3Loc[3],cstSpeed3Loc[4], 0.0, 255, 255, 255, curAlpha)
-					DrawSprite(cstytdName, "speed_digits_9", cstcenterCoords[1]+cstSpeed2Loc[1],cstcenterCoords[2]+cstSpeed2Loc[2],cstSpeed2Loc[3],cstSpeed2Loc[4], 0.0, 255, 255, 255, curAlpha)
-					DrawSprite(cstytdName, "speed_digits_9", cstcenterCoords[1]+cstSpeed1Loc[1],cstcenterCoords[2]+cstSpeed1Loc[2],cstSpeed1Loc[3],cstSpeed1Loc[4], 0.0, 255, 255, 255, curAlpha)
+					DrawSprite(cst.ytdName, "speed_digits_9", cst.centerCoords[1]+cst.Speed3Loc[1],cst.centerCoords[2]+cst.Speed3Loc[2],cst.Speed3Loc[3],cst.Speed3Loc[4], 0.0, 255, 255, 255, curAlpha)
+					DrawSprite(cst.ytdName, "speed_digits_9", cst.centerCoords[1]+cst.Speed2Loc[1],cst.centerCoords[2]+cst.Speed2Loc[2],cst.Speed2Loc[3],cst.Speed2Loc[4], 0.0, 255, 255, 255, curAlpha)
+					DrawSprite(cst.ytdName, "speed_digits_9", cst.centerCoords[1]+cst.Speed1Loc[1],cst.centerCoords[2]+cst.Speed1Loc[2],cst.Speed1Loc[3],cst.Speed1Loc[4], 0.0, 255, 255, 255, curAlpha)
 				end
 				if GetPedInVehicleSeat(veh, -1) == GetPlayerPed(-1) and GetVehicleClass(veh) >= 0 and GetVehicleClass(veh) < 13 or GetVehicleClass(veh) >= 17 then
 					if angle(veh) >= 10 and angle(veh) <= 18 then
 						driftSprite = "drift_blue"
-						DrawSprite(cstytdName, driftSprite, cstcenterCoords[1]+cstFuelBGLoc[1],cstcenterCoords[2]+cstFuelBGLoc[2],cstFuelBGLoc[3],cstFuelBGLoc[4], 0.0, 255, 255, 255, curDriftAlpha)
+						DrawSprite(cst.ytdName, driftSprite, cst.centerCoords[1]+cst.FuelBGLoc[1],cst.centerCoords[2]+cst.FuelBGLoc[2],cst.FuelBGLoc[3],cst.FuelBGLoc[4], 0.0, 255, 255, 255, curDriftAlpha)
 						BlinkDriftText(false)
 					elseif angle(veh) > 18 then
 						driftSprite = "drift_yellow"
-						DrawSprite(cstytdName, driftSprite, cstcenterCoords[1]+cstFuelBGLoc[1],cstcenterCoords[2]+cstFuelBGLoc[2],cstFuelBGLoc[3],cstFuelBGLoc[4], 0.0, 255, 255, 255, curDriftAlpha)
+						DrawSprite(cst.ytdName, driftSprite, cst.centerCoords[1]+cst.FuelBGLoc[1],cst.centerCoords[2]+cst.FuelBGLoc[2],cst.FuelBGLoc[3],cst.FuelBGLoc[4], 0.0, 255, 255, 255, curDriftAlpha)
 						BlinkDriftText(false)
 					elseif angle(veh) < 10 then
 						driftSprite = "drift_blue"
-						DrawSprite(cstytdName, driftSprite, cstcenterCoords[1]+cstFuelBGLoc[1],cstcenterCoords[2]+cstFuelBGLoc[2],cstFuelBGLoc[3],cstFuelBGLoc[4], 0.0, 255, 255, 255, curDriftAlpha)
+						DrawSprite(cst.ytdName, driftSprite, cst.centerCoords[1]+cst.FuelBGLoc[1],cst.centerCoords[2]+cst.FuelBGLoc[2],cst.FuelBGLoc[3],cst.FuelBGLoc[4], 0.0, 255, 255, 255, curDriftAlpha)
 						BlinkDriftText(true)
 					end
 				else
