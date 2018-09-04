@@ -83,6 +83,7 @@ function angle(veh)
 	return math.deg(math.acos(cosX))*0.5, modV
 end
 local function BlinkDriftText(hide)
+	if overwriteAlpha then curDriftAlpha = 0 return end
 	if hide == true or goDown == true then
 		curDriftAlpha = curDriftAlpha-15
 	elseif not hide or goDown == false then
