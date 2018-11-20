@@ -193,15 +193,15 @@ Citizen.CreateThread(function()
 					DrawSprite(cst.ytdName, "speed_digits_9", cst.centerCoords[1]+cst.Speed1Loc[1],cst.centerCoords[2]+cst.Speed1Loc[2],cst.Speed1Loc[3],cst.Speed1Loc[4], 0.0, 255, 255, 255, curAlpha)
 				end
 				if GetPedInVehicleSeat(veh, -1) == GetPlayerPed(-1) and GetVehicleClass(veh) >= 0 and GetVehicleClass(veh) < 13 or GetVehicleClass(veh) >= 17 then
-					if angle(veh) >= 10 and angle(veh) <= 18 then
+					if angle(veh) >= 10 and angle(veh) <= 18 and GetEntityHeightAboveGround(veh) <= 1.5 then
 						driftSprite = "drift_blue"
 						DrawSprite(cst.ytdName, driftSprite, cst.centerCoords[1]+cst.FuelBGLoc[1],cst.centerCoords[2]+cst.FuelBGLoc[2],cst.FuelBGLoc[3],cst.FuelBGLoc[4], 0.0, 255, 255, 255, curDriftAlpha)
 						BlinkDriftText(false)
-					elseif angle(veh) > 18 then
+					elseif angle(veh) > 18 and GetEntityHeightAboveGround(veh) <= 1.5 then
 						driftSprite = "drift_yellow"
 						DrawSprite(cst.ytdName, driftSprite, cst.centerCoords[1]+cst.FuelBGLoc[1],cst.centerCoords[2]+cst.FuelBGLoc[2],cst.FuelBGLoc[3],cst.FuelBGLoc[4], 0.0, 255, 255, 255, curDriftAlpha)
 						BlinkDriftText(false)
-					elseif angle(veh) < 10 then
+					elseif angle(veh) < 10 and GetEntityHeightAboveGround(veh) <= 1.5 then
 						driftSprite = "drift_blue"
 						DrawSprite(cst.ytdName, driftSprite, cst.centerCoords[1]+cst.FuelBGLoc[1],cst.centerCoords[2]+cst.FuelBGLoc[2],cst.FuelBGLoc[3],cst.FuelBGLoc[4], 0.0, 255, 255, 255, curDriftAlpha)
 						BlinkDriftText(true)
