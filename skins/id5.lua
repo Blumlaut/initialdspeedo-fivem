@@ -260,8 +260,10 @@ end
 
 Citizen.CreateThread(function()
 	RegisterCommand("speedounit", function(source, args, rawCommand)
-		useKPH = not useKPH
-		SetResourceKvp("initiald_unit", tostring(useKPH))
+		if getCurrentSkin() == skinData.skinName then
+			useKPH = not useKPH
+			SetResourceKvp("initiald_unit", tostring(useKPH))
+		end
 	end, false)
 
 
